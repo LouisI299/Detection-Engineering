@@ -1,0 +1,16 @@
+# Security & Credentials
+.env
+*.key
+*.pem
+*.pfx
+secrets.json
+
+# Large Log Files
+*.evtx
+*.pcap
+*.tar.gz
+*.zip
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
