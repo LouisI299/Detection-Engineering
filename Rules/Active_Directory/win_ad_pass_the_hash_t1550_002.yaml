@@ -1,0 +1,32 @@
+title: Pass The Hash
+id: 070eaef5-4b4b-4f59-b247-cdfd00290d6b
+status: experimental
+description: >
+  Detects use of stolen password hashes to move laterally.
+references:
+  - https://attack.mitre.org/techniques/T1546/003/
+author: Louis Ingelbrecht
+date: 2026-05-18
+tags:
+  - attack.lateral_movement
+  - attack.1550
+  - attack.t1550.002
+logsource:
+  product: windows
+  service: security
+detection:
+  selection_1:
+    EventID: 4624
+    LogonType: 9
+    LogonProcessName: seclogo
+  selection_2:
+    EventID: 4768
+    TicketencryptionType: 0x17
+  condition: selection
+falsepositives: some older legacy services may still use RC4 encryption. Add these to a filter "whitelist" to avoid false positives.
+fields:
+  - EventID
+  - LogonType
+  - LogonProcessName
+  - TicketEncryptionType
+

@@ -1,0 +1,34 @@
+title: Account Discovery - Domain Account - Command Line
+id: 3671a2d2-6fb6-4a73-84d3-ff69fc6cc55b
+status: experimental
+description: >
+  Detects adversaries using command-line tools to discover AD users and groups.
+  This rule looks for multiple executions of these commands within a short timeframe.
+references:
+  - https://attack.mitre.org/techniques/T1087/002/
+  - https://lolad-project.github.io/
+author: Louis Ingelbrecht
+date: 2026-05-18
+tags:
+  - attack.discovery
+  - attack.t1087
+  - attack.t1087.002
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    eventID: 1
+    Image|endswith:
+      - net.exe
+      - net1.exe
+      - nltest.exe
+      - dsquery.exe
+  condition: selection | count() > 5
+  timeframe: 1m
+falsepositives:
+  - Unknown
+fields:
+  - Commandline
+  - Image
+  - User

@@ -1,0 +1,26 @@
+title: Event Triggered Execution - Windows Management Instrumentation Event Subscription - WMI
+id: cef8fa13-5c5a-438c-b445-54f76ba243f6
+status: experimental
+description: >
+  Adversaries abusing WMI to subscribe to an event and execute code when that event occurs.
+references:
+  - https://attack.mitre.org/techniques/T1546/003/
+author: Louis Ingelbrecht
+date: 2026-05-18
+tags:
+  - attack.privilege_escalation
+  - attack.t1546
+  - attack.t1546.003
+logsource:
+  category: wmi_event
+  product: windows
+detection:
+  selection:
+    EventID: 5861
+    Message|contains: Binding Eventfilter
+  condition: selection
+fields:
+  - EventID
+  - Accountname
+  - Message
+

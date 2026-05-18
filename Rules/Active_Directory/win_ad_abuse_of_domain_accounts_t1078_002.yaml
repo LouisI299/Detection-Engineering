@@ -1,0 +1,62 @@
+title: Abuse of Domain Accounts (Base Rule)
+name: remote_logon
+id: c914d548-f2a0-40bc-bc61-4f76d77503e9
+status: experimental
+description: >
+  Detects user logon events, link rule to a schedule in SIEM, to only alert if users are logging in at unusual times.
+references:
+  - https://attack.mitre.org/techniques/T1078/002/
+author: Louis Ingelbrecht
+date: 2026-05-15
+tags:
+  - attack.initial_access
+  - attack.t1078
+  - attack.t1078.002
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4624
+    LogonType:
+      - 7
+      - 10
+  Filter_machine_accounts:
+    TargetUserName|endswith: $
+  filter_system_accounts:
+    TargetUserName: 
+      - SYSTEM
+      - LOCAL SERVICE
+      - REMOTE SERVICE
+  condition: selection AND NOT 1 of filter*
+level: informational
+fields:
+  - EventID
+  - TargetUserName
+  - LogonType
+---
+title: Abuse of Domain Accounts - Multihost Remote Logon
+domain_account_abuse_multi_host
+id: 80d72138-06d2-45dd-9db4-5f7ef3bc63f2
+status: experimental
+description: >
+  Detects single domain user account initiating remote logons from multiple IP addresses within a short timeframe.
+references:
+  - https://attack.mitre.org/techniques/T1078/002/
+author: Louis Ingelbrecht
+date: 2026-05-15
+tags:
+  - attack.initial_access
+  - attack.t1078
+  - attack.t1078.002
+correlation:
+  type: value_count
+  rules:
+    - remote_logon
+  group-by:
+    - TargetUserName
+  timespan: 5m
+  condition:
+    gte: 3
+    field: IpAddress
+level: high

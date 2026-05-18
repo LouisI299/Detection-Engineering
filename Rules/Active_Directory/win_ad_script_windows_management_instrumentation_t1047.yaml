@@ -1,0 +1,37 @@
+title: Windows Management Instrumentation - Powershell Script
+id: d0391abe-2a97-4edd-9a44-e303270b8584
+status: experimental
+description: >
+  Abuse of WMI to execute malicious commands and payloads.
+references:
+  - https://attack.mitre.org/techniques/T1047
+author: Louis Ingelbrecht
+date: 2026-05-18
+tags:
+  - attack.execution
+  - attack.t1047
+logsource:
+  category: ps_script
+  product: windows
+detection:
+  selection:
+    EventID: 4104
+    Image:
+      - powershell.exe
+      - pwsh.exe
+    ScriptBlockText|contains:
+      - wmic
+      - Invoke-CimMethod
+      - Invoke-WmiMethod
+      - Get-CimInstance
+    ScriptBlockText|contains|all:
+      - Win32_Process
+      - Create
+  condition: selection
+falsepositives:
+  - Legitimate system administration scripts
+fields:
+  - event.code
+  - process.name
+  - ScriptBlockText
+  - AccountName
