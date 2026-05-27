@@ -1,0 +1,25 @@
+title: C2 Over Web Protocol
+id: 1be17e54-e1f1-401a-b334-9ba39029ebf9
+status: experimental
+description: >
+  Native Crowdstrike rule to detect non-browser processes making outbound network connections. (Tuned to trigger only for connections to attacker subnet to avoid flood of false positives)
+  This rule is designed to trigger an alert that is forwarded to the SIEM. (For correlation with Fortigate events)
+references: 
+  - https://attack.mitre.org/techniques/T1071/001/
+author: Louis Ingelbrecht
+date: 2026-05-18
+tags: 
+  - attack.command_and_control
+  - attack.t1071
+  - attack.t1071.001
+platform: crowdstrike
+query_language: falcon logscale
+query: >
+  #event_simpleName=NetworkConnectIP4
+  | in(field="ContextBaseFileName", values=["curl.exe", "powershell.exe", "pwsh.exe", "certutil.exe"])
+  | in(field="RemoteAddressIP4", values=["172.17.80.*"])
+  | in(field="RemotePort", values=["80", "443"])
+response:
+  action: generate_alert
+  severity: Low
+  alert_name: C2 Over Web Protocol

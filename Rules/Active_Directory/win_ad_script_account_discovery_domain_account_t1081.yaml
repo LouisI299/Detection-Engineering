@@ -18,15 +18,15 @@ logsource:
   product: windows
 detection:
   selection:
-    eventID: 4104
-    Image|endswith:
+    action.id: 4104
+    process.name:
       - powershell.exe
       - pwsh.exe
-    CommandLine|contains:
+    action.properties.ScriptBlockText|contains:
       - Get-AD
       - Search-AD
   filter_admins:
-    User|contains:
+    user.name|contains:
       - admin
       - svc
       - AUTHORITY\SYSTEM
@@ -34,6 +34,6 @@ detection:
 falsepositives:
   - Unknown
 fields:
-  - Commandline
-  - Image
-  - User
+  - action.properties.ScriptBlockText
+  - process.name
+  - user.name

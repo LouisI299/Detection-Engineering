@@ -14,3 +14,6 @@ secrets.json
 # OS Generated Files
 .DS_Store
 Thumbs.db
+
+#Template file
+template.md

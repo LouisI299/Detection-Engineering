@@ -16,14 +16,14 @@ logsource:
   service: security
 detection:
   selection:
-    EventID: 4625
+    action.id: 4625
   condition: selection
 level: informational
 fields:
-  - EventID
-  - TargetUserName
-  - WorkstationName
-  - IpAddress
+  - action.id
+  - user.target.name
+  - host.hostname
+  - source.ip
 ---
 title: Brute Force - Password Guessing
 name: potential_bruteforce_guessing
@@ -44,61 +44,10 @@ correlation:
   rules:
     - failed_logon
   group-by:
-    - TargetUserName
+    - user.target.name
+    - source.ip
   timespan: 5m
   condition:
     gte: 10
 level: high
----
-title: Windows Succesful Logon (Base Rule)
-name: succesful_logon
-id: 7342b77f-8c5e-4d3c-9f48-c4296c0902ae
-status: experimental
-description: >
-  Detects succesful logon event, for use in brute force correlation rule.
-references:
-  - https://attack.mitre.org/techniques/T1110/001/
-author: Louis Ingelbrecht
-date: 2026-05-18
-tags:
-  - attack.credential_access
-  - attack.t1110
-logsource:
-  product: windows
-  service: security
-detection:
-  selection:
-    EventID: 4624
-  condition: selection
-level: informational
-fields:
-  - EventID
-  - TargetUserName
-  - WorkstationName
-  - IpAddress
----
-title: Brute Force - Succesful Password Guessing
-name: succesful_bruteforce_guessing
-id: 80c54852-20aa-4316-9af7-f1978062cecb
-status: experimental
-description: >
-  Detects multiple logon attempts targeting a single user within a short timeframe,
-  followed by a succesful logon event coming from the same IP (succesful bruteforce attack)
-references:
-  - https://attack.mitre.org/techniques/T1110/001/
-author: Louis Ingelbrecht
-date: 2026-05-18
-tags:
-  - attack.credential_access
-  - attack.t1110
-  - attack.t1110.001
-correlation:
-  type: temporal
-  rules:
-    - potential_bruteforce_guessing
-    - succesful_logon
-  group-by:
-    - IpAddress
-    - TargetUserName
-  timespan: 5m
-level: critical
+

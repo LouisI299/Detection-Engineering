@@ -16,14 +16,14 @@ logsource:
   product: windows
 detection:
   selection:
-    EventID: 13
-    Image|endswith: reg.exe
-    Details|endswith: dll
-  condition: selection AND NOT filter_admins
+    action.id: 13
+    process.name: reg.exe
+    action.properties.Details|endswith: dll
+  condition: selection
 falsepositives:
   - Unknown
 fields:
-  - EventID
-  - Image
-  - User
-  - Details
+  - action.id
+  - process.name
+  - user.name
+  - action.properties.Details

@@ -15,11 +15,11 @@ logsource:
   product: windows
 detection:
   selection_process:
-    EventID: 1
-    ParentImage|endswith: 
+    action.id: 1
+    process.parent.name: 
       - wmic.exe
       - WmiPrvSE.exe
-    Image|endswith:
+    process.name:
       - notepad.exe
       - calc.exe
       - cmd.exe
@@ -28,23 +28,23 @@ detection:
       - rundll32.exe
       - msiexec.exe
   selection_cli:
-    ParentImage|endswith:
+    process.parent.name:
       - cmd.exe
       - powershell.exe
       - pwsh.exe
-    CommandLine|contains:
+    process.command_line|contains:
       - wmic
       - Invoke-CimMethod
       - Invoke-WmiMethod
-    CommandLine|contains:
+    process.command_line|contains:
       - process call create
       - os get /FORMAT  
-  condition: selection_process OR selection_CLI
+  condition: selection_process OR selection_cli
 falsepositives:
   - Legitimate system administration scripts
 fields:
-  - EventID
-  - Image
-  - ParentImage
-  - CommandLine
-  - AccountName
+  - action.id
+  - process.name
+  - process.parent.name
+  - process.command_line
+  - user.name

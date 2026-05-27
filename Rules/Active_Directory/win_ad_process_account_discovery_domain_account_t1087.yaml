@@ -1,9 +1,9 @@
 title: Account Discovery - Domain Account - Command Line
-id: 3671a2d2-6fb6-4a73-84d3-ff69fc6cc55b
+id: df92d29e-a57b-422a-a128-8594d72fdd02
 status: experimental
 description: >
   Detects adversaries using command-line tools to discover AD users and groups.
-  This rule looks for multiple executions of these commands within a short timeframe.
+  This rule filters out known administrative accounts to reduce false positives.
 references:
   - https://attack.mitre.org/techniques/T1087/002/
   - https://lolad-project.github.io/
@@ -18,17 +18,21 @@ logsource:
   product: windows
 detection:
   selection:
-    eventID: 1
-    Image|endswith:
+    action.id: 1
+    process.name:
       - net.exe
       - net1.exe
       - nltest.exe
       - dsquery.exe
-  condition: selection | count() > 5
-  timeframe: 1m
+  filter_admins:
+    User.name|contains:
+      - admin
+      - svc
+      - AUTHORITY\SYSTEM
+  condition: selection AND NOT filter_admins
 falsepositives:
   - Unknown
 fields:
-  - Commandline
-  - Image
-  - User
+  - process.Commandline
+  - process.name
+  - user.name

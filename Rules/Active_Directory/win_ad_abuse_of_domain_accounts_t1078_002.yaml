@@ -1,5 +1,4 @@
-title: Abuse of Domain Accounts (Base Rule)
-name: remote_logon
+title: Abuse of Domain Accounts 
 id: c914d548-f2a0-40bc-bc61-4f76d77503e9
 status: experimental
 description: >
@@ -17,26 +16,34 @@ logsource:
   service: security
 detection:
   selection:
-    EventID: 4624
-    LogonType:
+    action.id: 4624
+    action.properties.LogonType:
       - 7
       - 10
   Filter_machine_accounts:
-    TargetUserName|endswith: $
+    user.target.name|endswith: $
   filter_system_accounts:
-    TargetUserName: 
+    user.target.name: 
       - SYSTEM
       - LOCAL SERVICE
       - REMOTE SERVICE
-  condition: selection AND NOT 1 of filter*
-level: informational
+  non_working_hours:
+    timestamp|timerange: 17:00-09:00
+  non_working_days:
+    timestamp|day_of_week:
+      - saturday
+      - sunday
+  non_working_dates:
+    timestamp|public_holiday_in: BE
+  condition: selection and not 1 of filter* and (non_working_hours or non_working_days or non_working_dates)
+level: medium
 fields:
-  - EventID
-  - TargetUserName
-  - LogonType
+  - action.id
+  - user.target.name
+  - action.properties.LogonType
+  - timestamp
 ---
 title: Abuse of Domain Accounts - Multihost Remote Logon
-domain_account_abuse_multi_host
 id: 80d72138-06d2-45dd-9db4-5f7ef3bc63f2
 status: experimental
 description: >
@@ -54,9 +61,9 @@ correlation:
   rules:
     - remote_logon
   group-by:
-    - TargetUserName
+    - user.target.name
   timespan: 5m
   condition:
     gte: 3
-    field: IpAddress
+    field: source.ip
 level: high

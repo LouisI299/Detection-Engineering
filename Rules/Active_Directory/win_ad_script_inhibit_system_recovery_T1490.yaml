@@ -1,4 +1,4 @@
-title: Windows Management Instrumentation - Powershell Script
+title: Inhibit System Recovery - Powershell Script
 id: 210dee09-b3e3-4389-a67e-f7e572758b0a
 status: experimental
 description: >
@@ -15,13 +15,14 @@ logsource:
   product: windows
 detection:
   selection:
-    EventID: 4104
-    ScriptBlockText|contains:
-      - delete shadows
+    action.id: 4104
+    action.properties.ScriptBlockText|contains:
+      - shadowcopy
+      - delete
   condition: selection
 falsepositives:
   - Administrator removing shadow copies
 fields:
-  - User
-  - Image
-  - ScriptBlockText
+  - user.name
+  - process.name
+  - action.properties.ScriptBlockText

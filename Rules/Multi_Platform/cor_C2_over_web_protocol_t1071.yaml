@@ -1,0 +1,111 @@
+title: Potential C2 over web protocol (Endpoint)
+name: edr_alert
+id: 204d4b9d-f9fc-43c7-ae70-1f3b8c487c16
+status: experimental
+description: >
+  Detects Crowdstrike/SentinelOne alerts of behavior that might indicate C2 traffic over web protocols.
+references:
+  - https://attack.mitre.org/techniques/1071/001/
+author: Louis Ingelbrecht
+date: 2026-05-27
+tags:
+  - attack.command_and_control
+  - attack.t1071
+  - attack.t1071.001
+logsource:
+  category: alert
+detection:
+  selection:
+    rule.name: 'C2 Over Web Protocol'
+  condition: selection
+level: informational
+---
+title: Web protocol Traffic (Firewall)
+name: fortigate_web_traffic
+id: 694f5937-f63a-49e4-9b4b-20986dcd6474
+status: experimental
+description: >
+  Detects suspicious sessions on port 80/443
+references:
+  - https://attack.mitre.org/techniques/1071/001/
+author: Louis Ingelbrecht
+date: 2026-05-27
+tags:
+  - attack.command_and_control
+  - attack.t1071
+  - attack.t1071.001
+logsource:
+  category: firewall
+  product: fortigate
+detection:
+  selection:
+    destination.port:
+      - 80
+      - 443
+    action.target: network.traffic
+    action.type: forward
+  condition: selection
+level: informational
+fields:
+  - source.ip
+  - destination.ip
+  - network.bytes
+---
+title: Potential C2 Traffic (Firewall)
+name: fortigate_c2
+id: a75d69c6-6479-4562-8ae3-a8e35bae86f8
+status: experimental
+description: >
+  Detects multiple sessions on web traffic ports, sending same amount of bytes over short intervals
+references:
+  - https://attack.mitre.org/techniques/1071/001/
+author: Louis Ingelbrecht
+date: 2026-05-27
+tags:
+  - attack.command_and_control
+  - attack.t1071
+  - attack.t1071.001
+action: correlation
+type: event_count
+rules: 
+  - fortigate_web_traffic
+group-by:
+  - source.ip
+  - destination.ip
+  - network.bytes
+timespan: 5m
+condition:
+  gte: 10
+level: informational
+---
+title: C2 Over Web Protocol
+id: 33cc594c-9c76-4f28-9efc-cbd3925439c7
+status: experimental
+description: >
+  Correlates automated, zero-variance network traffic on the firewall with suspicious processes initiating network connections on the endpoint
+references:
+  - https://attack.mitre.org/techniques/1071/001/
+author: Louis Ingelbrecht
+date: 2026-05-27
+tags:
+  - attack.command_and_control
+  - attack.t1071
+  - attack.t1071.001
+action: correlation
+type: temporal
+ordered: false
+rules: 
+  - edr_alert
+  - fortigate_c2
+aliases:
+  source.ip:
+    edr_alert: sentinelone.data.srcip
+    fortigate_c2: source.ip
+  destination.ip:
+    edr_alert: sentinelone.data.dstip
+    fortigate_c2: destination.ip
+group-by: 
+  - source.ip
+  - destination.ip
+timespan: 2m
+level: critical

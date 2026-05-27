@@ -16,11 +16,11 @@ logsource:
   product: windows
 detection:
   selection:
-    EventID: 5861
-    Message|contains: Binding Eventfilter
+    action.id: 5861
+    event.message|contains: Binding Eventfilter
   condition: selection
 fields:
-  - EventID
-  - Accountname
-  - Message
+  - action.id
+  - user.name
+  - event.essage
 

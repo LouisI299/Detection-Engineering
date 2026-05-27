@@ -17,15 +17,15 @@ logsource:
   product: windows
 detection:
   selection:
-    EventID: 1
-    Image|endswith: mofcomp.exe
-    ParentImage|endswith: 
+    action.id: 1
+    process.name: mofcomp.exe
+    process.parent.name: 
     - powershell.exe
     - pwsh.exe
   condition: selection
 fields:
-  - EventID
-  - Image
-  - ParentImage
+  - action.id
+  - process.name
+  - process.parent.name
   - CommandLine
 

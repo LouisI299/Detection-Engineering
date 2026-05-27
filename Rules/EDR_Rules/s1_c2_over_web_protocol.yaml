@@ -1,0 +1,22 @@
+title: C2 over web protocol
+id: 56b17cc4-73bf-4242-8c34-60c7c4f3817a
+status: experimental
+description: >
+  Native SentinelOne rule to detect non-browser processes making outbound network connections on ports associated with web traffic, which could indicate attempts to establish a C2 connection.
+  This rule is designed to trigger an alert that is forwarded to the SIEM. (For correlation with Fortigate events)
+references: 
+  - https://attack.mitre.org/techniques/T1071/001/
+author: Louis Ingelbrecht
+date: 2026-05-18
+tags: 
+  - attack.command_and_control
+  - attack.t1071
+  - attack.t1071.001
+platform: sentinelone
+query_language: s1ql
+query: >
+  event.type = 'IP Connect' and src.process.name in ('powershell.exe' , 'curl.exe', 'pwsh.exe', 'certutil.exe') and dst.port.number in ('80','443') and dst.ip.address != '172.17.70.*' and dst.ip.address != '172.17.60.*' and src.process.parent.name != 'Pulse.exe'
+response:
+  action: generate_alert
+  severity: Low
+  alert_name: C2 Over Web Protocol

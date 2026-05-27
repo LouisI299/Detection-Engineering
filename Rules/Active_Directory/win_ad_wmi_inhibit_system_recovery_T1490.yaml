@@ -1,4 +1,4 @@
-title: Windows Management Instrumentation - WMI
+title: Inhibit System Recovery - WMI
 id: 208b3a64-c966-4099-8532-62b97c849f4d
 status: experimental
 description: >
@@ -15,12 +15,12 @@ logsource:
   service: wmi
 detection:
   selection:
-    EventID: 5857
-    Message|endswith: vsswmi.dll
+    action.id: 5857
+    event.message|contains: vsswmi.dll
   condition: selection
 falsepositives:
   - Administrator removing shadow copies
 fields:
-  - User
-  - EventID
-  - Message
+  - user.name
+  - action.id
+  - event.message

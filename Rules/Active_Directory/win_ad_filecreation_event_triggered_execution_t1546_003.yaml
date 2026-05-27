@@ -17,15 +17,16 @@ logsource:
   product: windows
 detection:
   selection_1:
-    EventID: 11
-    Image|endswith: mofcomp.exe
+    action.id: 11
+    process.name: mofcomp.exe
   selection_2:
-    EventID: 11
-    Image|not|endswith: trusted_installer.exe
-    TargetFileName|startswith: C:\Windows\System32\wbem\MOF
-  condition: selection
+    action.id: 11
+    file.path|startswith: C:\Windows\System32\wbem\MOF
+  filter_trusted_process:
+    process.name: trusted_installer.exe
+  condition: selection_1 or selection_2 and not filter_trusted_process
 fields:
-  - EventID
-  - Image
-  - TargetFileName
+  - action.id
+  - process.name
+  - file.path
 

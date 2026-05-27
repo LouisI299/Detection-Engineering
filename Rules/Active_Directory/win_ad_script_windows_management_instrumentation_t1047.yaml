@@ -15,23 +15,23 @@ logsource:
   product: windows
 detection:
   selection:
-    EventID: 4104
-    Image:
+    action.id: 4104
+    process.name:
       - powershell.exe
       - pwsh.exe
-    ScriptBlockText|contains:
+    action.properties.ScriptBlockText|contains:
       - wmic
       - Invoke-CimMethod
       - Invoke-WmiMethod
       - Get-CimInstance
-    ScriptBlockText|contains|all:
+    action.properties.ScriptBlockText|contains|all:
       - Win32_Process
       - Create
   condition: selection
 falsepositives:
   - Legitimate system administration scripts
 fields:
-  - event.code
+  - action.id
   - process.name
-  - ScriptBlockText
-  - AccountName
+  - action.properties.ScriptBlockText
+  - user.name

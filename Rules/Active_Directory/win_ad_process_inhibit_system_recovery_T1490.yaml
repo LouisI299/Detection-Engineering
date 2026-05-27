@@ -1,4 +1,4 @@
-title: Windows Management Instrumentation - Process Creation
+title: Inhibit System Recovery 
 id: 2e3c3d3f-a25a-473a-a5b8-3dcb3d30b1c5
 status: experimental
 description: >
@@ -15,17 +15,17 @@ logsource:
   product: windows
 detection:
   selection:
-    EventID: 1
-    Image|endswith:
+    action.id: 1
+    process.name:
       - vssadmin.exe
       - diskshadow.exe
-    CommandLine|contains:
+    process.Command_Line|contains:
       - delete shadows
       - /quiet
   condition: selection
 falsepositives:
   - Administrator removing shadow copies
 fields:
-  - User
-  - Image
-  - Commandline
+  - user.name
+  - process.name
+  - process.Commandline
