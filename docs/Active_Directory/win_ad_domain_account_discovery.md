@@ -15,33 +15,33 @@
 `Detection-Engineering\Rules\Active_Directory\win_ad_script_1m_account_discovery_domain_account_t1081.yaml`
 
 ## 2. Threat Description
-Adversaries can compile WMI scripts into Windows Management Object files using mofcomp.exe to create malicious event subscriptions. 
+Adversaries can use built-in commands/powershell scripts to retrieve information about domain users, groups, privileges,...
 
-These events are triggered under the wmiprvse process which runs on SYSTEM privileges, allowing them to escalate privileges.
+This information can then be used to decide which high-privileged/service accounts to target.
 
-Blue Mockingbird malware uses mofcomp.exe to create malicious WMI Event Subscriptions.
+Adversary groups such as APT41 and BRONZE BUTLER used "net" commands to enumerate domain administrator users.
 
 ## 3. Detection Strategy
-* **Detection Logic:** This rule detects file creation events made by the process mofcomp.exe or files made inside the MOF folder. Some legitimate programs exhibit this same kind of behavior, so this rule needs to be tuned to the organisation's environment.
+* **Detection Logic:** Given the fact that these commants and powershell tools are commonly used by administrators, this rule detects multiple executions within a short timeframe, indicating attempts at domain account discovery. Use of these commands by non-admin users is also seen as suspicious, but not included in this rule because only administrators can logon to this AD Domain Controller.
 * **Key Fields Evaluated:**
-  * `action.id`: Detect file creation event (11)
-  * `process.name`: Detect files created by process mofcomp.exe, and filtering out legitimate processes
-  * `file.path`: Detect files created inside MOF folder
+  * `action.id`: Detect process creation (1) or powershell script execution (4104) events.
+  * `process.name`: Detects the creation of processes such as net, nltest, and dsquery.
+  * `action.properties.ScriptBlockText`: Detect powershell tools such as Get-AD or Search-AD
 
 ## 4. Execution & Validation
 * **How to Trigger:**
-  1. Triggered using Atomic Red Team automatic test (T1546.003-3)
+  1. Execute 5 or more domain enumeration commands/scripts within 1 minute.
 * **Trigger Evidence:**
-  * **Sekoia Alert ID:** ALjk1nUmS7ie
-  * **Timestamp:** 2026-05-20 14:55:07
-  * **Screenshot:** (Detection-Engineering\images\mofcomp-test.png) (Detection-Engineering\images\mofcomp-alert.png) 
+  * **Sekoia Alert ID:** AL4Ky23JchHC/ALzvbJYDFqpm
+  * **Timestamp:** 2026-05-20 14:11:43 / 2026-05-20 15:32:56
+  * **Screenshot:** (Detection-Engineering\images\domain-user-cmd.png) (Detection-Engineering\images\domain-user-cmd-alert.png) (Detection-Engineering\images\domain-user-ps.png) (Detection-Engineering\images\domain-user-ps-alert.png)
 
 ## 5. Maintenance & Tuning
 * **Known False Positives:**
-  * Legitimate services creating MOF Files
+  * Legitimate use for administrative purposes
 * **Tuning Notes:**
-  * Identify and filter out legitimate services that create MOF files
+  * ?
 
 ## 6. Research Sources
-* https://attack.mitre.org/techniques/T1546/003/
-* https://cyberbuff.github.io/TheAtomicPlaybook/tactics/privilege-escalation/T1546.003.html
+* https://attack.mitre.org/techniques/T1087/002/
+* https://lolad-project.github.io/
